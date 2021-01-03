@@ -5,7 +5,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/veandco/go-sdl2/img"
 	"github.com/veandco/go-sdl2/sdl"
 	ttf "github.com/veandco/go-sdl2/ttf"
 )
@@ -42,7 +41,17 @@ func run() error {
 
 	time.Sleep(5 * time.Second)
 
-	if err := drawBackground(r); err != nil {
+	bg, err := newBackGround(r)
+
+	if err != nil {
+		return fmt.Errorf("Couldnt create background %v", err)
+	}
+
+	defer bg.destroy()
+
+	err = bg.draw(r)
+
+	if err != nil {
 		return fmt.Errorf("Couldnt draw background %v", err)
 	}
 
@@ -83,23 +92,5 @@ func drawTitle(r *sdl.Renderer) error {
 
 	r.Present()
 
-	return nil
-}
-
-func drawBackground(r *sdl.Renderer) error {
-	r.Clear()
-
-	t, err := img.LoadTexture(r, "background/sea.jpg")
-
-	if err != nil {
-		return fmt.Errorf("Couldnt load background image %v", err)
-	}
-	defer t.Destroy()
-
-	if err := r.Copy(t, nil, nil); err != nil {
-		return fmt.Errorf("Couldnt copy bg texture%v", err)
-	}
-
-	r.Present()
 	return nil
 }
